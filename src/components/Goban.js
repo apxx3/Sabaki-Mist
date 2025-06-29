@@ -233,7 +233,10 @@ export default class Goban extends Component {
       animateStonePlacement = true,
 
       drawLineMode = null,
-      transformation = ''
+      transformation = '',
+      blackVisionMap = [],
+      whiteVisionMap = [],
+      currentPlayer
     },
     {
       top = 0,
@@ -251,6 +254,20 @@ export default class Goban extends Component {
   ) {
     let signMap = board.signMap
     let markerMap = board.markers
+
+    // 新增：根据可视区域处理signMap
+    let filteredSignMap = signMap.map((row, y) =>
+      row.map((cell, x) => {
+        if (currentPlayer === 1) {
+          return blackVisionMap[y] && blackVisionMap[y][x] ? cell : 0
+        } else if (currentPlayer === -1) {
+          return whiteVisionMap[y] && whiteVisionMap[y][x] ? cell : 0
+        } else {
+          return cell
+        }
+      })
+    )
+    signMap = filteredSignMap
 
     let transformLine = line =>
       gobantransformer.transformLine(

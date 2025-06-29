@@ -113,6 +113,36 @@ export default class MainView extends Component {
     let handicap = +gametree.getRootProperty(gameTree, 'HA', 0)
     let paintMap
 
+    // 新增：生成黑白双方的可视区域，自动计算
+    function getVisionMap(signMap, player) {
+      const height = signMap.length
+      const width = signMap[0].length
+      // 初始化全0
+      let vision = Array.from({length: height}, () => Array(width).fill(0))
+      // 遍历所有己方棋子
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          if (signMap[y][x] === player) {
+            // 以曼哈顿距离2为半径照亮
+            for (let dy = -2; dy <= 2; dy++) {
+              for (let dx = -2; dx <= 2; dx++) {
+                if (Math.abs(dx) + Math.abs(dy) <= 2) {
+                  let nx = x + dx
+                  let ny = y + dy
+                  if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                    vision[ny][nx] = 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      return vision
+    }
+    let blackVisionMap = getVisionMap(board.signMap, 1)
+    let whiteVisionMap = getVisionMap(board.signMap, -1)
+
     if (['scoring', 'estimator'].includes(mode)) {
       paintMap = areaMap
     } else if (mode === 'guess') {
@@ -166,7 +196,12 @@ export default class MainView extends Component {
           transformation: boardTransformation,
 
           onVertexClick: this.handleGobanVertexClick,
-          onLineDraw: this.handleGobanLineDraw
+          onLineDraw: this.handleGobanLineDraw,
+
+          // 新增：传递可视区域
+          blackVisionMap,
+          whiteVisionMap,
+          currentPlayer
         })
       ),
 
