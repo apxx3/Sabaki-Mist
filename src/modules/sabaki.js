@@ -835,12 +835,6 @@ class Sabaki extends EventEmitter {
           this.makeMove(vertex, {
             generateEngineMove: this.state.engineGameOngoing == null
           })
-        } else if (
-          board.markers[vy][vx] != null &&
-          board.markers[vy][vx].type === 'point' &&
-          setting.get('edit.click_currentvertex_to_remove')
-        ) {
-          this.removeNode(treePosition)
         }
       } else if (button === 2) {
         if (
